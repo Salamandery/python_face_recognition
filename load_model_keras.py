@@ -1,7 +1,4 @@
 from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from sklearn.model_selection import train_test_split
-from tensorflow.keras.applications import VGG19
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import Normalizer
 from sklearn.metrics import confusion_matrix
@@ -72,7 +69,7 @@ callbacks = [checkpoint, lr_reduce]
 model = models.Sequential()
 model.add(layers.Dense(64, activation="relu", input_shape=input_shape))
 model.add(layers.Dropout(0.5))
-model.add(layers.Dense(7, activation="softmax"))
+model.add(layers.Dense(3, activation="softmax"))
 
 model.summary()
 model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=['accuracy'])

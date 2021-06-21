@@ -1,3 +1,7 @@
 venv
 venv7
 faces.h5
+dist
+build
+__pycache__
+.idea
