@@ -5,3 +5,9 @@ dist
 build
 __pycache__
 .idea
+db_con.*
+faces.*
+unknow.csv
+faces_svm.sav
+facenet_keras.h5
+*.mp4

@@ -1,12 +1,15 @@
 from PIL import Image
 from os import listdir
-from os.path import isdir
+from os.path import isdir, dirname
 from numpy import asarray, expand_dims
 from tensorflow.keras.models import load_model
 from sklearn.utils import shuffle
 import pandas as pd
 
 random_state = 42
+BIN_DIR = dirname(__file__) + "\\bin\\"
+FACENET_DIR = BIN_DIR + "facenet_keras.h5"
+FACES_CSV = BIN_DIR + "faces.csv"
 
 
 def face_to_array(filename, size=(160, 160)):
@@ -24,8 +27,9 @@ def load_faces(source):
         path = source + filename
         try:
             faces.append(face_to_array(path))
-        except:
+        except Exception as e:
             print("Erro ao ler imagem {}".format(path))
+            raise e
 
     return faces
 
@@ -40,7 +44,7 @@ def load(source):
 
         faces = load_faces(path)
         labels = [subdir for _ in range(len(faces))]
-        print('Carregado %d faces da classe %s'% (len(faces), subdir))
+        print('Carregado %d faces da classe %s' % (len(faces), subdir))
 
         x.extend(faces)
         y.extend(labels)
@@ -59,20 +63,30 @@ def get_embedding(model, face_pixels):
     return yhat[0]
 
 
-trainX, trainY = load(source="C:\\dataset\\faces\\")
-print(trainX.shape, trainY.shape)
-newTrainX = list()
-model = load_model('facenet_keras.h5')
+def execProcess(target):
+    if not target == "":
+        trainX, trainY = load(source=target)
+        print(trainX.shape, trainY.shape)
+        newTrainX = list()
+        model = load_model(FACENET_DIR)
 
-for face_pixels in trainX:
-    embedding = get_embedding(model, face_pixels)
-    newTrainX.append(embedding)
+        for face_pixels in trainX:
+            embedding = get_embedding(model, face_pixels)
+            newTrainX.append(embedding)
 
-newTrainX = asarray(newTrainX)
-print("Shape: ", newTrainX.shape)
-#print(newTrainX)
+        newTrainX = asarray(newTrainX)
+        print("Shape: ", newTrainX.shape)
+        #print(newTrainX)
 
-df = pd.DataFrame(data=newTrainX)
-df['target'] = trainY
-df.to_csv('faces.csv')
-x, y = shuffle(newTrainX, trainY, random_state=random_state)
+        df = pd.DataFrame(data=newTrainX)
+        df['target'] = trainY
+        df.to_csv(FACES_CSV, index=False)
+        x, y = shuffle(newTrainX, trainY, random_state=random_state)
+
+
+def main():
+    print("GERANDO EMBEDDING PARA TREINO")
+
+
+if __name__ == "__main__":
+    execProcess("")
